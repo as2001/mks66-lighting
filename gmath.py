@@ -34,6 +34,10 @@ def calculate_specular(light, sreflect, view, normal):
     pass
 
 def limit_color(color):
+    if color > 255:
+        color = 255
+    elif color < 0:
+        color = 0
     pass
 
 #vector functions
