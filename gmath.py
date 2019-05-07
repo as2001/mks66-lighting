@@ -22,23 +22,38 @@ SPECULAR_EXP = 4
 
 #lighting functions
 def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect ):
-    pass
+    return limit_color([x+y+z for x,y,z in [(calculate_ambient(ambient, areflect)[i],
+                                             calculate_diffuse(light, dreflect, normal)[i],
+                                             calculate_specular(light, sreflect, view, normal)[i])
+                                            for i in range(3)]
+                        ])
 
 def calculate_ambient(alight, areflect):
-    pass
+    return [alight[0]*areflect[0],
+            alight[1]*areflect[1],
+            alight[2]*areflect[2]]
 
-def calculate_diffuse(light, dreflect, normal):
-    pass
+def calculate_diffuse(light, dreflect, normal):    
+    if dot_product(light[0],normal) > 0:
+        dot = dot_product(light[0],normal)
+        return [light[1][0]*dreflect[0]*dot,
+                light[1][1]*dreflect[1]*dot,
+                light[1][2]*dreflect[2]*dot]
+    return [0,0,0]
 
 def calculate_specular(light, sreflect, view, normal):
-    pass
+    x = dot_product([(2*dot_product(light[0],normal)*normal[0])-light[0][0],
+                     (2*dot_product(light[0],normal)*normal[1])-light[0][1],
+                     (2*dot_product(light[0],normal)*normal[2])-light[0][2]],
+                    view)    
+    if(x>0):
+        return [light[1][0]*sreflect[0]*(x**SPECULAR_EXP),
+                light[1][1]*sreflect[1]*(x**SPECULAR_EXP),
+                light[1][2]*sreflect[2]*(x**SPECULAR_EXP)]
+    return [0,0,0]
 
 def limit_color(color):
-    if color > 255:
-        color = 255
-    elif color < 0:
-        color = 0
-    pass
+    return [255 if x > 255 else 0 if x < 0 else x for x in color]
 
 #vector functions
 #normalize vetor, should modify the parameter
